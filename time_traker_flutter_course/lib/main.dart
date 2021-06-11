@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:time_traker_flutter_course/landing_page.dart';
 import 'package:time_traker_flutter_course/services/auth.dart';
-import 'package:time_traker_flutter_course/services/auth_provider.dart';
-
+import 'package:provider/provider.dart';
 
 
 Future<void> main() async {
@@ -17,9 +15,9 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   @override //statelessWidget 을 오버라이드
   Widget build(BuildContext context) {
-    return AuthProvider(
-      auth: Auth(),
-       child: MaterialApp( //위젯
+    return Provider<AuthBase>(
+      create: (context) => Auth(),
+      child: MaterialApp( //위젯
       title: 'time Tracker',
       theme: ThemeData(
         primarySwatch: Colors.indigo,
