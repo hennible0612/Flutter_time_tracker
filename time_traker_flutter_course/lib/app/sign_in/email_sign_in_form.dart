@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:time_traker_flutter_course/app/sign_in/validators.dart';
 import 'package:time_traker_flutter_course/common_widgets/form_submit_button.dart';
 import 'package:time_traker_flutter_course/common_widgets/show_alert_dialog.dart';
-import 'package:time_traker_flutter_course/services/auth_provider.dart';
+import 'package:time_traker_flutter_course/services/auth.dart';
+import 'package:provider/provider.dart';
 
 enum EmailSignInFormType { signIn, register }
 class EmailSignInForm extends StatefulWidget with EmailAndPasswordValidators {
@@ -29,7 +30,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       _isLoading = true;
     });
     try{
-      final auth = AuthProvider.of(context);
+      final auth = Provider.of<AuthBase>(context, listen: false);
       if(_formType == EmailSignInFormType.signIn){//signIn상태라면
         await auth.signInWithEmailAndPassword(_email, _password);//로그인
       }else{
