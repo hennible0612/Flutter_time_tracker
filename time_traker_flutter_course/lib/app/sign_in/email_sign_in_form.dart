@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:time_traker_flutter_course/app/sign_in/validators.dart';
 import 'package:time_traker_flutter_course/common_widgets/form_submit_button.dart';
 import 'package:time_traker_flutter_course/common_widgets/show_alert_dialog.dart';
+import 'package:time_traker_flutter_course/common_widgets/show_exception_alert_dialog.dart';
 import 'package:time_traker_flutter_course/services/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -39,7 +40,11 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       Navigator.of(context).pop();//성공시 pop해서 제거
     }
     on FirebaseAuthException catch(e){
-      showAlertDialog(context, title: 'Sign in failed', content: e.message, defaultActionText: 'ok',);
+      showExceptionAlertDialog(
+        context,
+        title: 'Sign in failed',
+        exception: e,
+      );
 
     } finally{
       setState(() { //무조건 실행
