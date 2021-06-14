@@ -5,7 +5,7 @@ import 'package:time_traker_flutter_course/common_widgets/form_submit_button.dar
 import 'package:time_traker_flutter_course/common_widgets/show_alert_dialog.dart';
 import 'package:time_traker_flutter_course/services/auth.dart';
 import 'package:provider/provider.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 enum EmailSignInFormType { signIn, register }
 class EmailSignInForm extends StatefulWidget with EmailAndPasswordValidators {
   @override
@@ -38,8 +38,8 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       }
       Navigator.of(context).pop();//성공시 pop해서 제거
     }
-    catch(e){
-      showAlertDialog(context, title: 'Sign in failed', content: e.toString(), defaultActionText: 'ok',);
+    on FirebaseAuthException catch(e){
+      showAlertDialog(context, title: 'Sign in failed', content: e.message, defaultActionText: 'ok',);
 
     } finally{
       setState(() { //무조건 실행
