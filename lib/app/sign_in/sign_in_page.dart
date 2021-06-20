@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:time_traker_flutter_course/app/sign_in/sign_in_bloc.dart';
 import 'package:time_traker_flutter_course/app/sign_in/sign_in_button.dart';
 import 'package:time_traker_flutter_course/app/sign_in/social_sign_in_button.dart';
 import 'package:time_traker_flutter_course/app/sign_in/email_sign_in_page.dart';
@@ -8,6 +9,14 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SignInPage extends StatefulWidget {
+  static Widget create(BuildContext context){
+    return Provider<SignInBloc>( //parent 타입: SignInBloc
+      create: (_)=> SignInBloc(),
+      child: SignInPage(),
+    );
+  }
+
+
   @override
   _SignInPageState createState() => _SignInPageState();
 }
