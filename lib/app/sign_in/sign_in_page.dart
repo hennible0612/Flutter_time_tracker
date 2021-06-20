@@ -84,17 +84,25 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bloc = Provider.of<SignInBloc>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: Text('Time Tracker'),
         elevation: 2.0, // 앱바 그림자
       ),
-      body: _buildContent(context),
+      body: StreamBuilder<bool>(
+        stream: bloc.isLoadingStream,
+        initialData: false,
+        builder: (context, snapshot) {
+          return _buildContent(context, snapshot.data);
+        }
+      ),
       backgroundColor: Colors.grey[200], //백그라운드 컬러
     );
   }
 
-  Widget _buildContent(BuildContext context) { // _ 언더스코어는 private이 된다. 자기 파일에서만 접속가능
+  Widget _buildContent(BuildContext context, bool isLoading) { // _ 언더스코어는 private이 된다. 자기 파일에서만 접속가능
+
     return Padding( //Container대신 return 가능 단 색깔 지정 불가능, 바꿈에도 실행이 가능한 이유는 childe로 Colum을 가지고 있기 때문
       //body는 스카폴드의 하얀색 배경부분 거기에 컨테이너를 추가
       //color: Colors.yellow,//return padding 할경우 색깔 지정 못함
