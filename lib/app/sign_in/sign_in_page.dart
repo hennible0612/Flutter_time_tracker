@@ -8,21 +8,13 @@ import 'package:time_traker_flutter_course/services/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class SignInPage extends StatefulWidget {
+class SignInPage extends StatelessWidget {
   static Widget create(BuildContext context){
     return Provider<SignInBloc>( //parent 타입: SignInBloc
       create: (_)=> SignInBloc(),
       child: SignInPage(),
     );
   }
-
-
-  @override
-  _SignInPageState createState() => _SignInPageState();
-}
-
-class _SignInPageState extends State<SignInPage> {
-  bool _isLoading = false; //대기상태
 
   void _showSignInError(BuildContext context, Exception exception){
     if(exception is FirebaseException && exception.code == 'ERROR_ABORTED_BY_USER'){
@@ -37,38 +29,41 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   Future<void> _signInAnonymously(BuildContext context) async{
+    final bloc = Provider.of<SignInBloc>(context, listen: false);
     try{//에런 catch
-      setState(()=> _isLoading = true); //로딩
+      bloc.setIsLoading(true); //로딩
       final auth = Provider.of<AuthBase>(context, listen: false);
       await auth.signInAnonymously();
     }on Exception catch(e){
       _showSignInError(context, e);
     } finally{
-      setState(()=> _isLoading = false); //로딩 끝
+      bloc.setIsLoading(false);
     }
   }
 
   Future<void> _signInWithGoogle(BuildContext context) async{
+    final bloc = Provider.of<SignInBloc>(context, listen: false);
     try{//에런 catch
-      setState(()=> _isLoading = true);
+      bloc.setIsLoading(true); //로딩
       final auth = Provider.of<AuthBase>(context, listen: false);
       await auth.signInWithGoogle();
     }on Exception catch(e){
       _showSignInError(context, e);
     }finally{
-      setState(()=> _isLoading = false); //로딩 끝
+      bloc.setIsLoading(false); //로딩 끝
     }
   }
 
   Future<void> _signInWithFacebook(BuildContext context) async{
+    final bloc = Provider.of<SignInBloc>(context, listen: false);
     try{//에런 catch
-      setState(()=> _isLoading = true);
+      bloc.setIsLoading(true); //로딩
       final auth = Provider.of<AuthBase>(context, listen: false);
       await auth.signInWithFacebook();
     }on Exception catch(e){
       _showSignInError(context, e);
     }finally{
-      setState(()=> _isLoading = false); //로딩 끝
+      bloc.setIsLoading(false); //로딩 끝
     }
   }
 
@@ -102,7 +97,6 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   Widget _buildContent(BuildContext context, bool isLoading) { // _ 언더스코어는 private이 된다. 자기 파일에서만 접속가능
-
     return Padding( //Container대신 return 가능 단 색깔 지정 불가능, 바꿈에도 실행이 가능한 이유는 childe로 Colum을 가지고 있기 때문
       //body는 스카폴드의 하얀색 배경부분 거기에 컨테이너를 추가
       //color: Colors.yellow,//return padding 할경우 색깔 지정 못함
@@ -113,7 +107,7 @@ class _SignInPageState extends State<SignInPage> {
             CrossAxisAlignment.stretch, //children이 가로로 어떻게 나와야하는지 정함
         children: <Widget>[
           SizedBox(height: 50.0,
-              child: _buildHeader()
+              child: _buildHeader(isLoading),
           ),
 
           SizedBox(height: 48.0),
@@ -122,7 +116,7 @@ class _SignInPageState extends State<SignInPage> {
             text: 'Sign in with Google',
             textColor: Colors.black87,
             color: Colors.white,
-            onPressed: _isLoading ? null : ()=> _signInWithGoogle(context),
+            onPressed: isLoading ? null : ()=> _signInWithGoogle(context),
           ),
           SizedBox(height: 8.0),
           SocialSignInButton(
@@ -130,14 +124,14 @@ class _SignInPageState extends State<SignInPage> {
             text: 'Sign in with Facebook',
             textColor: Colors.white,
             color: Color(0xFF334D92),
-            onPressed:_isLoading ? null : ()=> _signInWithFacebook(context),
+            onPressed:isLoading ? null : ()=> _signInWithFacebook(context),
           ),
           SizedBox(height: 8.0),
           SignInButton(
             text: 'Sign in with email',
             textColor: Colors.white,
             color: Colors.teal[700],
-            onPressed:_isLoading ? null : () => _signInWithEmail(context),
+            onPressed:isLoading ? null : () => _signInWithEmail(context),
           ),
           SizedBox(height: 8.0),
           Text(
@@ -150,7 +144,7 @@ class _SignInPageState extends State<SignInPage> {
             text: 'Go anonymous',
             textColor: Colors.black,
             color: Colors.lime[300],
-            onPressed:_isLoading ? null : ()=> _signInAnonymously(context),
+            onPressed:isLoading ? null : ()=> _signInAnonymously(context),
           ),
 
         ],
@@ -158,8 +152,8 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-  Widget _buildHeader(){
-    if(_isLoading){
+  Widget _buildHeader(bool isLoading){
+    if(isLoading){
       return Center(
         child: CircularProgressIndicator(),
       );
