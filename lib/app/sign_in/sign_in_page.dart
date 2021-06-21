@@ -9,10 +9,13 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SignInPage extends StatelessWidget {
+
+  const SignInPage({Key key, @required this.bloc}) : super(key : key);
+  final SignInBloc bloc;
   static Widget create(BuildContext context){
     return Provider<SignInBloc>( //parent 타입: SignInBloc
       create: (_)=> SignInBloc(),
-      child: SignInPage(),
+      child: Consumer<SignInBloc>(builder: (_,bloc,__)=>SignInPage(bloc: bloc,)),
     );
   }
 
@@ -29,7 +32,6 @@ class SignInPage extends StatelessWidget {
   }
 
   Future<void> _signInAnonymously(BuildContext context) async{
-    final bloc = Provider.of<SignInBloc>(context, listen: false);
     try{//에런 catch
       bloc.setIsLoading(true); //로딩
       final auth = Provider.of<AuthBase>(context, listen: false);
@@ -42,7 +44,6 @@ class SignInPage extends StatelessWidget {
   }
 
   Future<void> _signInWithGoogle(BuildContext context) async{
-    final bloc = Provider.of<SignInBloc>(context, listen: false);
     try{//에런 catch
       bloc.setIsLoading(true); //로딩
       final auth = Provider.of<AuthBase>(context, listen: false);
@@ -55,7 +56,6 @@ class SignInPage extends StatelessWidget {
   }
 
   Future<void> _signInWithFacebook(BuildContext context) async{
-    final bloc = Provider.of<SignInBloc>(context, listen: false);
     try{//에런 catch
       bloc.setIsLoading(true); //로딩
       final auth = Provider.of<AuthBase>(context, listen: false);
@@ -79,7 +79,6 @@ class SignInPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = Provider.of<SignInBloc>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: Text('Time Tracker'),
