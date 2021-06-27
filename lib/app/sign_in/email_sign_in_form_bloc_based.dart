@@ -33,11 +33,6 @@ class _EmailSignInFormBlocBasedState extends State<EmailSignInFormBlocBased> {
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
-  String get _email => _emailController.text;
-  String get _password => _passwordController.text;
-  EmailSignInFormType _formType = EmailSignInFormType.signIn;
-  bool _submitted = false;
-  bool _isLoading = false;
 
   @override
   void dispose(){
@@ -51,17 +46,8 @@ class _EmailSignInFormBlocBasedState extends State<EmailSignInFormBlocBased> {
 
 
   void _submit() async{
-    setState(() {
-      _submitted = true;
-      _isLoading = true;
-    });
     try{
-      final auth = Provider.of<AuthBase>(context, listen: false);
-      if(_formType == EmailSignInFormType.signIn){//signIn상태라면
-        await auth.signInWithEmailAndPassword(_email, _password);//로그인
-      }else{
-        await auth.createUserWithEmailAndPassword(_email, _password);
-      }
+      await widget.bloc.submit();
       Navigator.of(context).pop();//성공시 pop해서 제거
     }
     on FirebaseAuthException catch(e){
@@ -70,44 +56,43 @@ class _EmailSignInFormBlocBasedState extends State<EmailSignInFormBlocBased> {
         title: 'Sign in failed',
         exception: e,
       );
-
-    } finally{
-      setState(() { //무조건 실행
-        _isLoading = false;
-      });
     }
   }
-  void  _emailEditingComplete(){
-    final newFocus = widget.emailValidator.isValid(_email)
+
+  void  _emailEditingComplete(EmailSignInModel model){
+    final newFocus = widget.emailValidator.isValid(model.email)
         ? _passwordFocusNode : _emailFocusNode;
     FocusScope.of(context).requestFocus(newFocus);
   }
-  void _toggleFormType() {
-    setState(() {
-      _submitted = false;
-      _formType = _formType == EmailSignInFormType.signIn
+  void _toggleFormType(EmailSignInModel model) {
+    widget.bloc.updateWith(
+      email: '',
+      password: '',
+      formType: model.formType == EmailSignInFormType.signIn
           ? EmailSignInFormType.register
-          : EmailSignInFormType.signIn;
-    });
+          : EmailSignInFormType.signIn,
+        isLoading: false,
+        submitted: false,
+    );
     _emailController.clear();
     _passwordController.clear();
   }
 
-  List<Widget> _buildChildren() {
-    final primaryText = _formType == EmailSignInFormType.signIn
+  List<Widget> _buildChildren(EmailSignInModel model) {
+    final primaryText = model.formType == EmailSignInFormType.signIn
         ? 'Sign in'
         : 'Create an account';
-    final secondaryText = _formType == EmailSignInFormType.signIn
+    final secondaryText = model.formType == EmailSignInFormType.signIn
         ? 'Need an account? Register'
         : 'Have an account? Sign in';
 
-    bool submitEnabled = widget.emailValidator.isValid(_email)
-        && widget.passwordValidator.isValid(_password) && !_isLoading; //비어있는지 확인
+    bool submitEnabled = widget.emailValidator.isValid(model.email)
+        && widget.passwordValidator.isValid(model.password) && !model.isLoading; //비어있는지 확인
 
     return [
-      _buildEmailTextField(),
+      _buildEmailTextField(model),
       SizedBox(height: 8.0),
-      _buildPasswordTextField(),
+      _buildPasswordTextField(model),
       SizedBox(height: 8.0),
       FormSubmitButton(
         text: primaryText,
@@ -116,30 +101,30 @@ class _EmailSignInFormBlocBasedState extends State<EmailSignInFormBlocBased> {
       SizedBox(height: 8.0),
       FlatButton(
         child: Text(secondaryText),
-        onPressed: !_isLoading ? _toggleFormType : null,
+        onPressed: !model.isLoading ? ()=> _toggleFormType(model) : null,
       ),
     ];
   }
 
-  TextField _buildPasswordTextField() {
-    bool showErrorText = _submitted && !widget.passwordValidator.isValid(_password);
+  TextField _buildPasswordTextField(EmailSignInModel model) {
+    bool showErrorText = model.submitted && !widget.passwordValidator.isValid(model.password);
     return TextField(
       controller: _passwordController,
       focusNode: _passwordFocusNode, //패스워드 포커스노드드
       decoration: InputDecoration(
         labelText: 'Password',
         errorText: showErrorText ? widget.invalidPasswordErrorText : null,
-        enabled: _isLoading == false,
+        enabled: model.isLoading == false,
       ),
       obscureText: true, //암호화
       textInputAction: TextInputAction.done,
-      onChanged: (password) => _updateState(),
+      onChanged: (password) => widget.bloc.updateWith(password: password ),
       onEditingComplete: _submit,//다입력시 _submit호출
     );
   }
 
-  TextField _buildEmailTextField() {
-    bool showErrorText = _submitted && !widget.emailValidator.isValid(_email) ;
+  TextField _buildEmailTextField(EmailSignInModel model) {
+    bool showErrorText = model.submitted && !widget.emailValidator.isValid(model.email) ;
     return TextField(
       controller: _emailController,
       focusNode: _emailFocusNode, //이메일 포커스노드
@@ -147,36 +132,33 @@ class _EmailSignInFormBlocBasedState extends State<EmailSignInFormBlocBased> {
         labelText: 'Email',
         hintText: 'test@test.com', //선택시
         errorText: showErrorText ? widget.invalidEmailErrorText : null,
-        enabled: _isLoading == false,
+        enabled: model.isLoading == false,
       ),
       keyboardType: TextInputType.emailAddress, //@
       autocorrect: false,//단어 추천 X
       textInputAction: TextInputAction.next,
-      onChanged: (email) => _updateState(),
-      onEditingComplete: _emailEditingComplete,
+      onChanged: (email) => widget.bloc.updateWith(email: email),
+      onEditingComplete: () => _emailEditingComplete(model),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<EmailSignInModel>(
+
       stream: widget.bloc.modelStream,
       initialData: EmailSignInModel(),
       builder: (context, snapshot) {
+        final EmailSignInModel model = snapshot.data;
         return Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch, //패딩 안 차일드 길이 조절 (가로)
             mainAxisSize: MainAxisSize.min, //Column 사이즈 조절
-            children: _buildChildren(),
+            children: _buildChildren(model),
           ),
         );
       }
     );
-  }
-  void _updateState(){
-    print('email: $_email, password: $_password');
-    setState((){
-    });
   }
 }
