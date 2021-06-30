@@ -4,8 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:time_traker_flutter_course/services/auth.dart';
 
-class SignInBloc{
-  SignInBloc({@required this.auth, @required this.isLoading});
+class SignInManager{
+  SignInManager({@required this.auth, @required this.isLoading});
   final AuthBase auth;
   final ValueNotifier<bool> isLoading;
 

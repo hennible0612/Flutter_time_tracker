@@ -10,16 +10,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class SignInPage extends StatelessWidget {
 
-  const SignInPage({Key key, @required this.bloc}) : super(key : key);
-  final SignInBloc bloc;
+  const SignInPage({Key key, @required this.bloc, @required this.isLoading}) : super(key : key);
+  final SignInManager bloc;
+  final bool isLoading;
+
   static Widget create(BuildContext context){
     final auth = Provider.of<AuthBase>(context, listen: false);
     return ChangeNotifierProvider<ValueNotifier<bool>>(
       create:(_) => ValueNotifier<bool>(false),
       child: Consumer<ValueNotifier<bool>>(
-        builder: (_, isLoading,__)=> Provider<SignInBloc>( //parent 타입: SignInBloc
-          create: (_)=> SignInBloc(auth: auth, isLoading: isLoading),
-          child: Consumer<SignInBloc>(builder: (_,bloc,__)=>SignInPage(bloc: bloc,)),
+        builder: (_, isLoading,__)=> Provider<SignInManager>( //Loading스테이트 부를시 사인인페이지 만듬
+          create: (_)=> SignInManager(auth: auth, isLoading: isLoading),
+          child: Consumer<SignInManager>(builder: (_,bloc,__)=>SignInPage(bloc: bloc,isLoading:isLoading.value)),
         ),
       ),
     );
@@ -72,18 +74,17 @@ class SignInPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = Provider.of<ValueNotifier<bool>>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Time Tracker'),
         elevation: 2.0, // 앱바 그림자
       ),
-      body: _buildContent(context, isLoading.value),
+      body: _buildContent(context),
       backgroundColor: Colors.grey[200], //백그라운드 컬러
     );
   }
 
-  Widget _buildContent(BuildContext context, bool isLoading) { // _ 언더스코어는 private이 된다. 자기 파일에서만 접속가능
+  Widget _buildContent(BuildContext context) { // _ 언더스코어는 private이 된다. 자기 파일에서만 접속가능
     return Padding( //Container대신 return 가능 단 색깔 지정 불가능, 바꿈에도 실행이 가능한 이유는 childe로 Colum을 가지고 있기 때문
       //body는 스카폴드의 하얀색 배경부분 거기에 컨테이너를 추가
       //color: Colors.yellow,//return padding 할경우 색깔 지정 못함
@@ -94,7 +95,7 @@ class SignInPage extends StatelessWidget {
             CrossAxisAlignment.stretch, //children이 가로로 어떻게 나와야하는지 정함
         children: <Widget>[
           SizedBox(height: 50.0,
-              child: _buildHeader(isLoading),
+              child: _buildHeader(),
           ),
 
           SizedBox(height: 48.0),
@@ -139,7 +140,7 @@ class SignInPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(bool isLoading){
+  Widget _buildHeader(){
     if(isLoading){
       return Center(
         child: CircularProgressIndicator(),
