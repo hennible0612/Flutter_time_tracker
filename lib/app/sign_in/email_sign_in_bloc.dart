@@ -43,6 +43,7 @@ class EmailSignInBloc{
       rethrow;
     }
   }
+
   void updateWith({
   String email,
     String password,
