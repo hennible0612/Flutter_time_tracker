@@ -1,21 +1,38 @@
 //email_sign_in_change_model.dart
 import 'package:flutter/cupertino.dart';
 import 'package:time_traker_flutter_course/app/sign_in/validators.dart';
+import 'package:time_traker_flutter_course/services/auth.dart';
 import 'email_sign_in_model.dart';
 
 class EmailSignInChangeModel with EmailAndPasswordValidators, ChangeNotifier {
   EmailSignInChangeModel({
+    @required this.auth,
     this.email='',
     this.password='',
     this.formType=EmailSignInFormType.signIn,
     this.isLoading=false,
     this.submitted =false,
   });
+  final AuthBase auth;
    String email;
    String password;
    EmailSignInFormType formType;
    bool isLoading;
    bool submitted;
+
+  Future <void> submit() async{
+    updateWith(submitted: true, isLoading: true);
+    try{
+      if(formType == EmailSignInFormType.signIn){//signIn상태라면
+        await auth.signInWithEmailAndPassword(email, password);//로그인
+      }else{
+        await auth.createUserWithEmailAndPassword(email, password);
+      }
+    }catch(e){
+      updateWith(isLoading: false);
+      rethrow;
+    }
+  }
 
   String get primaryButtonText{
     return formType == EmailSignInFormType.signIn
@@ -57,6 +74,7 @@ class EmailSignInChangeModel with EmailAndPasswordValidators, ChangeNotifier {
       submitted: false,
     );
   }
+
   void updateEmail(String email) => updateWith(email: email);
   void updatePassword(String password) => updateWith(password: password);
   void updateWith({
