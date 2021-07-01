@@ -25,6 +25,7 @@ class EmailSignInFormChangeNotifier extends StatefulWidget  {
   @override
   _EmailSignInFormChangeNotifierState createState() => _EmailSignInFormChangeNotifierState();
 }
+
 class _EmailSignInFormChangeNotifierState extends State<EmailSignInFormChangeNotifier> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();

@@ -11,7 +11,6 @@ class EmailSignInBloc{
   Stream<EmailSignInModel> get modelStream => _modelController.stream;
   EmailSignInModel _model = EmailSignInModel();
 
-
   void dispose(){
     _modelController.close();
   }
@@ -27,6 +26,7 @@ class EmailSignInBloc{
       submitted: false,
     );
   }
+
   void updateEmail(String email) => updateWith(email: email);
   void updatePassword(String password) => updateWith(password: password);
 
