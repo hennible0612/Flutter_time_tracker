@@ -3,7 +3,7 @@ import 'package:time_traker_flutter_course/common_widgets/show_alert_dialog.dart
 import 'package:time_traker_flutter_course/services/auth.dart';
 import 'package:provider/provider.dart';
 
-class HomePage extends StatelessWidget {
+class JobsPage extends StatelessWidget {
   Future<void> _signOut(BuildContext context) async{
     try{//에런 catch
       final auth = Provider.of<AuthBase>(context, listen: false);

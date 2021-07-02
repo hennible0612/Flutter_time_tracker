@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:time_traker_flutter_course/app/sign_in/sign_in_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:time_traker_flutter_course/home_page.dart';
+import 'package:time_traker_flutter_course/home/jobs_page.dart';
 import 'package:time_traker_flutter_course/services/auth.dart';
 import 'package:provider/provider.dart';
 
@@ -19,7 +19,7 @@ class LandingPage extends StatelessWidget {
 
                //landing_page 자동적으로 SignInPage호출
             }
-            return HomePage(
+            return JobsPage(
 
             ); //로그인이 되어있으면
           }
