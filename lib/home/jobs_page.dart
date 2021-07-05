@@ -4,6 +4,8 @@ import 'package:time_traker_flutter_course/services/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:time_traker_flutter_course/services/database.dart';
 
+import 'models/job.dart';
+
 class JobsPage extends StatelessWidget {
   Future<void> _signOut(BuildContext context) async{
     try{//에런 catch
@@ -28,10 +30,7 @@ class JobsPage extends StatelessWidget {
 
   Future<void> _createJob(BuildContext context) async {
     final database = Provider.of<Database>(context, listen: false);
-    await database.createJob({
-      'name': 'Blogging',
-      'ratePerHour': 10
-    });
+    await database.createJob(Job(name: 'Blogging', ratePerHour: 10));
   }
 
   @override
