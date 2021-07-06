@@ -17,6 +17,10 @@ class JobsPage extends StatelessWidget {
     }
   }
   Future<void> _confirmSignOut(BuildContext context) async {
+    final database = Provider.of<Database>(context, listen: false);
+    database.readJobs();
+
+
     final didRequestSignOut = await showAlertDialog(
       context,
       title: 'Logout',
