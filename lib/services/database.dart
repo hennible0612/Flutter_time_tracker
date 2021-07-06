@@ -6,7 +6,7 @@ import 'APIPath.dart';
 
 abstract class Database{
   Future<void> createJob(Job job);
-  void readJobs();
+  void jobsStream();
 }
 
 class FirestoreDatabase implements Database{
@@ -18,13 +18,19 @@ class FirestoreDatabase implements Database{
       data: job.toMap(),
     );
 
-  void readJobs(){
+  Stream<List<Job>> jobsStream(){
     final path = APIPath.jobs(uid);
     final reference = FirebaseFirestore.instance.collection(path);
     final snapshots = reference.snapshots();
-    snapshots.listen((snapshot){ //모든snapshot doc 출력
-      snapshot.docs.forEach((snapshot)=> print(snapshot.data()));
-    });
+    return snapshots.map((snapshot)=> snapshot.docs.map( //map 사용해서 list만듬
+        (snapshot){
+          final data = snapshot.data(); //각각 job을 넣음음
+            return data != null ? Job( //null이 아닐시 아래 데이터 job으로
+            name: data['name'],
+            ratePerHour: data['ratePerHour'],
+          ): null;
+        }
+    ));
   }
 
   Future<void> _setData({String path, Map<String, dynamic>data}) async{
