@@ -3,6 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 class FirestoreService{
+  FirestoreService._();
+  static final instance = FirestoreService._();
+
   Future<void> setData({String path, Map<String, dynamic>data}) async {
     final reference = FirebaseFirestore.instance.doc(path);
     print('$path: $data');
